@@ -19,6 +19,8 @@ func (kernel Kernel) Migrations() []schema.Migration {
 		&migrations.M20250812211259CreateUsersHasRoleTable{},
 		&migrations.M20250812212932CreatePermissionsTable{},
 		&migrations.M20250812213219CreateRoleHasPermissionTable{},
+		&migrations.M20250813095246CreateSocialAccountsTable{},
+		&migrations.M20250813095900AlterUsersForSocialAuth{},
 	}
 }
 
