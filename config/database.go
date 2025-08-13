@@ -24,13 +24,17 @@ func init() {
 				},
 			},
 			"postgres": map[string]any{
-				"host":     config.Env("DB_HOST", "127.0.0.1"),
-				"port":     config.Env("DB_PORT", 5432),
-				"database": config.Env("DB_DATABASE", "forge"),
-				"username": config.Env("DB_USERNAME", "forge"),
-				"password": config.Env("DB_PASSWORD", ""),
-				"sslmode":  config.Env("DB_SSLMODE", "disable"),
-				"timezone": config.Env("DB_TIMEZONE", "UTC"),
+				"host":         config.Env("DB_HOST", "127.0.0.1"),
+				"port":         config.Env("DB_PORT", 5432),
+				"database":     config.Env("DB_DATABASE", "forge"),
+				"username":     config.Env("DB_USERNAME", "forge"),
+				"password":     config.Env("DB_PASSWORD", ""),
+				"sslmode":      config.Env("DB_SSLMODE", "disable"),
+				"timezone":     config.Env("DB_TIMEZONE", "UTC"),
+				"prepare_stmt": false,
+
+				"statement_cache_mode":     "none",
+				"statement_cache_capacity": 0,
 				"via": func() (driver.Driver, error) {
 					return postgresfacades.Postgres("postgres")
 				},
