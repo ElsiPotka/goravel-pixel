@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/goravel/framework/contracts/database/driver"
 	"github.com/goravel/framework/facades"
+	postgresfacades "github.com/goravel/postgres/facades"
 	sqlitefacades "github.com/goravel/sqlite/facades"
 )
 
@@ -20,6 +21,18 @@ func init() {
 				"singular": false,
 				"via": func() (driver.Driver, error) {
 					return sqlitefacades.Sqlite("sqlite")
+				},
+			},
+			"postgres": map[string]any{
+				"host":     config.Env("DB_HOST", "127.0.0.1"),
+				"port":     config.Env("DB_PORT", 5432),
+				"database": config.Env("DB_DATABASE", "forge"),
+				"username": config.Env("DB_USERNAME", "forge"),
+				"password": config.Env("DB_PASSWORD", ""),
+				"sslmode":  config.Env("DB_SSLMODE", "disable"),
+				"timezone": config.Env("DB_TIMEZONE", "UTC"),
+				"via": func() (driver.Driver, error) {
+					return postgresfacades.Postgres("postgres")
 				},
 			},
 		},
