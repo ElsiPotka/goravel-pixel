@@ -4,6 +4,7 @@ import (
 	"pixel/app/models"
 
 	"github.com/google/uuid"
+	"github.com/goravel/framework/contracts/database/orm"
 	"github.com/goravel/framework/facades"
 )
 
@@ -56,4 +57,31 @@ func (s *RoleService) GetByRoleType(roleType models.RoleType) (*models.Role, err
 	var role models.Role
 	err := facades.Orm().Query().Where("role = ?", roleType).First(&role)
 	return &role, err
+}
+
+func (s *RoleService) AssignRoleToUser(user *models.User, roleName models.RoleType) error {
+	var role models.Role
+	err := facades.Orm().Query().
+		Where("role = ?", roleName).
+		First(&role)
+
+	if err != nil {
+		return err
+	}
+
+	return facades.Orm().Query().
+		Model(user).
+		Association("Roles").
+		Append(&role)
+}
+
+func (s *RoleService) AssignRoleToUserTx(query orm.Query, user *models.User, roleName models.RoleType) error {
+	var role models.Role
+	err := query.Where("role = ?", roleName).First(&role)
+
+	if err != nil {
+		return err
+	}
+
+	return query.Model(user).Association("Roles").Append(&role)
 }

@@ -62,10 +62,7 @@ func (s *AuthService) Register(ctx http.Context, data RegisterData) (*models.Use
 		return nil, "", "", 0, err
 	}
 
-	var role models.Role
-	if err := facades.Orm().Query().Where("role = ?", models.RoleClient).First(&role); err == nil {
-		facades.Orm().Query().Model(&user).Association("Roles").Append(&role)
-	}
+	_ = s.roleService.AssignRoleToUser(&user, models.RoleClient)
 
 	accessToken, err := facades.Auth(ctx).Login(&user)
 	if err != nil {
