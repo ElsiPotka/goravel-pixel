@@ -6,8 +6,8 @@ import (
 )
 
 type LoginUserRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
+	Email    string `form:"email" json:"email"`
+	Password string `form:"password" json:"password"`
 }
 
 func (r *LoginUserRequest) Authorize(ctx http.Context) error {

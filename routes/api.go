@@ -11,6 +11,7 @@ func Api() {
 	userController := controllers.NewUserController()
 	authController := controllers.NewAuthController()
 	roleController := controllers.NewRoleController()
+	oAuthController := controllers.NewOAuthController()
 
 	facades.Route().Prefix("api/v1").Group(func(router route.Router) {
 
@@ -29,10 +30,10 @@ func Api() {
 
 			router.Post("/register", authController.Register)
 			router.Post("/login", authController.Login)
+			router.Post("/logout", authController.Logout)
+			router.Get("/oauth/{provider}", oAuthController.OAuthLogin)
+			router.Get("/oauth/{provider}/callback", oAuthController.OAuthCallback)
 
-			// Login Route (for future use)
-			// Final Path: POST /api/v1/auth/login
-			// router.Post("/login", authController.Login)
 		})
 	})
 }
