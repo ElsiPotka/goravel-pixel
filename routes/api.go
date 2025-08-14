@@ -29,10 +29,11 @@ func Api() {
 
 			router.Post("/register", authController.Register)
 			router.Post("/login", authController.Login)
+			router.Post("/logout", authController.Logout)
 
-			// Login Route (for future use)
-			// Final Path: POST /api/v1/auth/login
-			// router.Post("/login", authController.Login)
+			//router.Post("/oauth/google", authController.OauthGoogle)
+			//router.Post("/oauth/facebook", authController.OauthFacebook)
+
 		})
 	})
 }

@@ -16,6 +16,8 @@ require (
 	gorm.io/gorm v1.30.0
 )
 
+require github.com/markbates/goth v1.81.0 // indirect
+
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect

@@ -123,6 +123,7 @@ func init() {
 			&providers.DatabaseServiceProvider{},
 			&gin.ServiceProvider{},
 			&postgres.ServiceProvider{},
+			&providers.OauthServiceProvider{},
 		},
 	})
 }
