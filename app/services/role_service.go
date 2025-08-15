@@ -2,6 +2,7 @@ package services
 
 import (
 	"pixel/app/models"
+	"slices"
 
 	"github.com/google/uuid"
 	"github.com/goravel/framework/contracts/database/orm"
@@ -84,4 +85,180 @@ func (s *RoleService) AssignRoleToUserTx(query orm.Query, user *models.User, rol
 	}
 
 	return query.Model(user).Association("Roles").Append(&role)
+}
+
+func (s *RoleService) HasRoleByUserID(userID uuid.UUID, role models.RoleType) (bool, error) {
+	var user models.User
+
+	err := facades.Orm().Query().
+		With("Roles").
+		Where("id = ?", userID).
+		First(&user)
+
+	if err != nil {
+		return false, err
+	}
+
+	for _, userRole := range user.Roles {
+		if userRole.Role == role && userRole.IsActive {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s *RoleService) HasRolesByUserID(userID uuid.UUID, roles []models.RoleType) (bool, error) {
+	var user models.User
+
+	err := facades.Orm().Query().
+		With("Roles").
+		Where("id = ?", userID).
+		First(&user)
+
+	if err != nil {
+		return false, err
+	}
+
+	for _, userRole := range user.Roles {
+		if !userRole.IsActive {
+			continue
+		}
+
+		if slices.Contains(roles, userRole.Role) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s *RoleService) HasRole(user *models.User, role models.RoleType) (bool, error) {
+	if len(user.Roles) == 0 {
+		err := facades.Orm().Query().
+			With("Roles").
+			Where("id = ?", user.ID).
+			First(user)
+
+		if err != nil {
+			return false, err
+		}
+	}
+
+	for _, userRole := range user.Roles {
+		if userRole.Role == role && userRole.IsActive {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s *RoleService) HasRoles(user *models.User, roles []models.RoleType) (bool, error) {
+	if len(user.Roles) == 0 {
+		err := facades.Orm().Query().
+			With("Roles").
+			Where("id = ?", user.ID).
+			First(user)
+
+		if err != nil {
+			return false, err
+		}
+	}
+
+	for _, userRole := range user.Roles {
+		if !userRole.IsActive {
+			continue
+		}
+
+		if slices.Contains(roles, userRole.Role) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s *RoleService) GetUserRolesByUserID(userID uuid.UUID) ([]models.Role, error) {
+	var user models.User
+
+	err := facades.Orm().Query().
+		With("Roles").
+		Where("id = ?", userID).
+		First(&user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var activeRoles []models.Role
+	for _, role := range user.Roles {
+		if role.IsActive {
+			activeRoles = append(activeRoles, role)
+		}
+	}
+
+	return activeRoles, nil
+}
+
+func (s *RoleService) GetUserRoles(user *models.User) ([]models.Role, error) {
+	if len(user.Roles) == 0 {
+		err := facades.Orm().Query().
+			With("Roles").
+			Where("id = ?", user.ID).
+			First(user)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var activeRoles []models.Role
+	for _, role := range user.Roles {
+		if role.IsActive {
+			activeRoles = append(activeRoles, role)
+		}
+	}
+
+	return activeRoles, nil
+}
+
+func (s *RoleService) IsSuperAdmin(user *models.User) (bool, error) {
+	return s.HasRole(user, models.RoleSuperAdmin)
+}
+
+func (s *RoleService) IsAdmin(user *models.User) (bool, error) {
+	return s.HasRole(user, models.RoleAdmin)
+}
+
+func (s *RoleService) IsManager(user *models.User) (bool, error) {
+	return s.HasRole(user, models.RoleManager)
+}
+
+func (s *RoleService) IsPartner(user *models.User) (bool, error) {
+	return s.HasRole(user, models.RolePartner)
+}
+
+func (s *RoleService) IsClient(user *models.User) (bool, error) {
+	return s.HasRole(user, models.RoleClient)
+}
+
+func (s *RoleService) IsSuperAdminByID(userID uuid.UUID) (bool, error) {
+	return s.HasRoleByUserID(userID, models.RoleSuperAdmin)
+}
+
+func (s *RoleService) IsAdminByID(userID uuid.UUID) (bool, error) {
+	return s.HasRoleByUserID(userID, models.RoleAdmin)
+}
+
+func (s *RoleService) IsManagerByID(userID uuid.UUID) (bool, error) {
+	return s.HasRoleByUserID(userID, models.RoleManager)
+}
+
+func (s *RoleService) IsPartnerByID(userID uuid.UUID) (bool, error) {
+	return s.HasRoleByUserID(userID, models.RolePartner)
+}
+
+func (s *RoleService) IsClientByID(userID uuid.UUID) (bool, error) {
+	return s.HasRoleByUserID(userID, models.RoleClient)
 }

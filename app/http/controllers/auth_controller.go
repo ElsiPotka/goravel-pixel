@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/google/uuid"
 	"pixel/app/http/requests"
 	"pixel/app/http/resources"
 	"pixel/app/services"
@@ -108,4 +109,32 @@ func (c *AuthController) Logout(ctx http.Context) http.Response {
 
 	response := resources.NewSuccessResponse("User logged out successfully", nil)
 	return ctx.Response().Json(http.StatusOK, response)
+}
+
+func (c *AuthController) Impersonate(ctx http.Context) http.Response {
+	idParam := ctx.Request().Route("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		return ctx.Response().Json(400, resources.ApiResponse{
+			Status:  "error",
+			Message: "Invalid UUID",
+			Data:    nil,
+		})
+	}
+
+	user, accessToken, refreshToken, expiresIn, err := c.authService.Impersonate(ctx, id)
+	if err != nil {
+		return ctx.Response().Json(500, resources.ApiResponse{
+			Status:  "error",
+			Message: "Impersonation failed",
+			Data:    nil,
+		})
+	}
+
+	jwtResp := resources.NewJWTResponse(accessToken, refreshToken, expiresIn)
+	userResource := resources.NewUserResource(user)
+	authResponse := resources.NewAuthResponse(*jwtResp, *userResource)
+
+	response := resources.NewSuccessResponse("Impersonation successful", authResponse)
+	return ctx.Response().Json(200, response)
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 )
@@ -138,4 +139,25 @@ func (s *AuthService) Login(ctx http.Context, data LoginData) (*models.User, str
 
 func (s *AuthService) Logout(ctx http.Context) error {
 	return facades.Auth(ctx).Logout()
+}
+
+func (s *AuthService) Impersonate(ctx http.Context, userID uuid.UUID) (*models.User, string, string, int64, error) {
+	user, err := s.userService.GetUserByID(userID)
+	if err != nil {
+		return nil, "", "", 0, err
+	}
+
+	if user == nil {
+		return nil, "", "", 0, fmt.Errorf("user not found")
+	}
+
+	accessToken, err := facades.Auth(ctx).Login(user)
+	if err != nil {
+		return nil, "", "", 0, err
+	}
+
+	refreshToken := "-"
+	expiresIn := int64(facades.Config().GetInt("jwt.ttl") * 60)
+
+	return user, accessToken, refreshToken, expiresIn, nil
 }

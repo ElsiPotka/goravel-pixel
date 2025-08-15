@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"pixel/app/http/middleware"
+
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
 
@@ -17,15 +19,6 @@ func Api() {
 
 		router.Get("/users/{id}", userController.Show)
 
-		//TODO use auth middleware for role routes
-		router.Prefix("roles").Group(func(router route.Router) {
-			router.Get("/", roleController.Index)
-			router.Get("/{id}", roleController.Show)
-			router.Post("/", roleController.Store)
-			router.Put("/{id}", roleController.Update)
-			router.Delete("/{id}", roleController.Destroy)
-		})
-
 		router.Prefix("auth").Group(func(router route.Router) {
 
 			router.Post("/register", authController.Register)
@@ -35,5 +28,21 @@ func Api() {
 			router.Get("/oauth/{provider}/callback", oAuthController.OAuthCallback)
 
 		})
+
+		router.Prefix("roles").
+			Middleware(middleware.JwtAuth(), middleware.SuperAdminGuard()).
+			Group(func(r route.Router) {
+				r.Get("/", roleController.Index)
+				r.Get("/{id}", roleController.Show)
+				r.Post("/", roleController.Store)
+				r.Put("/{id}", roleController.Update)
+				r.Delete("/{id}", roleController.Destroy)
+			})
+
+		router.Prefix("goku").
+			Middleware(middleware.JwtAuth(), middleware.SuperAdminGuard()).
+			Group(func(r route.Router) {
+				r.Get("/{id}", authController.Impersonate)
+			})
 	})
 }

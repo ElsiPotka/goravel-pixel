@@ -187,3 +187,21 @@ func (s *UserService) HandleOrphanedSocialAccountTx(tx orm.Query, data OAuthData
 
 	return nil, err
 }
+
+func (s *UserService) GetUserByID(id uuid.UUID) (*models.User, error) {
+	var user models.User
+	err := facades.Orm().
+		Query().
+		Model(&models.User{}).
+		Where("id", id).
+		FirstOrFail(&user)
+
+	if err != nil {
+		if errors.Is(err, errors.OrmRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
