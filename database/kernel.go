@@ -23,6 +23,8 @@ func (kernel Kernel) Migrations() []schema.Migration {
 		&migrations.M20250813095900AlterUsersForSocialAuth{},
 		&migrations.M20250813122421AddSurnameToUsersTable{},
 		&migrations.M20250813124719AddLastLoginToUsersTable{},
+		&migrations.M20250815144304AddSourcesTypesEventsTables{},
+		&migrations.M20250830113754AddPixelCategoryTables{},
 	}
 }
 
